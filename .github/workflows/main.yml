@@ -19,6 +19,18 @@ jobs:
       run: |
         SHA=$(echo $GITHUB_SHA | head -c7 )
         echo "sha=$SHA" >> $GITHUB_OUTPUT
+        
+    - name: Login into the container registry
+      users: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
     
-    - name: Build docker image
-      run: docker build -t julioceno/nlw-journey-api:${{ steps.generate_sha.outputs.sha }} .
+    - name: Build and Push
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: true
+        tags: |
+          julioceno/nlw-journey-api:${{ steps.generate_sha.outputs.sha }}
+          julioceno/nlw-journey-api:lasted
